@@ -49,6 +49,7 @@ func! PlugInstall()
 endfunc
 
 "C，C++ 按分号e编译运行
+noremap <Leader>e :call CompileRunGcc()<CR>
 func! CompileRunGcc()
 	exec "w"
 	if &filetype == 'c'
@@ -66,7 +67,6 @@ func! CompileRunGcc()
 		exec "! ./%"
 	endif
 endfunc
-noremap <Leader>e :call CompileRunGcc()<CR>
 "利用C:\Windows\ctags.exe在当前目录下生成详细tag文件的命令：ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q
 "}}}
 
@@ -485,7 +485,7 @@ augroup END
 augroup shell_
 	autocmd!
 	autocmd FileType sh iabbrev <buffer> yfsh #! /bin/bash<cr>
-	autocmd FileType sh iabbrev <buffer> iff if []; then<cr><cr>fi<esc>f]i
+	autocmd FileType sh iabbrev <buffer> iff if []; then<cr><cr>fi<esc>2kf]i
 augroup END
 " }}}
 
