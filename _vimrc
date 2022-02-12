@@ -48,12 +48,6 @@ func! PlugInstall()
 	exec "PlugInstall"
 endfunc
 
-"分号d 编译用gdb打开
-noremap <Leader>d :call CompileDebug()<CR>
-func! CompileDebug()
-	exec "w"
-	exec "!g++ -Wall -std=c++17 -g % -o %:r.exe; gdb %:r.exe"
-endfunc
 "C，C++ 按分号e编译运行
 func! CompileRunGcc()
 	exec "w"
@@ -73,31 +67,7 @@ func! CompileRunGcc()
 	endif
 endfunc
 noremap <Leader>e :call CompileRunGcc()<CR>
-"分号m 执行makefile
-noremap <Leader>m :call Make()<CR>
-func! Make()
-	exec "w"
-	exec "!make; ./%:r"
-endfunc
-"分号sh 进入shell
-noremap <Leader>sh :call IntoShell()<CR>
-func! IntoShell()
-	exec "w"
-	exec "terminal"
-endfunc
 "利用C:\Windows\ctags.exe在当前目录下生成详细tag文件的命令：ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q
-"有了ctag以后，ctrl+] 进入函数定义，ctrl+o 回退
-"生成 并更新tag文件
-noremap <Leader>tag :call Ctag()<CR>
-func! Ctag()
-	if(has("gui_running"))
-		if &filetype == 'c'
-			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
-		elseif &filetype == 'cpp'
-			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
-		endif
-	endif
-endfunc
 "}}}
 
 "yes!the former partion still here in _vimrc successfully![[[[former]]]]
@@ -136,6 +106,22 @@ nnoremap <space> viw
 vnoremap <space> vviW
 " "S"ource "V"imrc"的首字母，表示重读vimrc配置文件。
 nnoremap <leader>sv <esc>:source $MYVIMRC<cr>
+"分号sh 进入shell
+noremap <Leader>sh :call IntoShell()<CR>
+func! IntoShell()
+	exec "w"
+	exec ":shell"
+endfunc
+"分号tag 生成 并更新tag文件 "有了ctag以后，ctrl+] 进入函数定义，ctrl+o 回退。 
+noremap <Leader>tag :call Ctag()<CR>
+func! Ctag()
+		if &filetype == 'c'
+			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
+		elseif &filetype == 'cpp'
+			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
+		endif
+	endif
+endfunc
 " 使用;w快捷键保存内容
 nnoremap <Leader>w :w<CR>
 inoremap <Leader>w <ESC>:w<CR>
@@ -170,15 +156,13 @@ inoremap <silent><s-tab> <Esc>:tabprevious<CR>
 nnoremap <silent><Tab>q :tabclose<CR>	"退出标签
 nnoremap <silent><Tab>n :tabnext<CR>	"下一个标签页
 nnoremap <silent><Tab>p :tabprevious<CR>	"上一个标签页
-
-
 " }}}
 " <Leader>映射已经使用的快捷键说明----------{{{
 "+ 1 2 3 4 5 6 7 8 9 0                              访问第几个tab标签页
 "+ a												"A"ll selected
 "+ bd												"B"uffer "D"elete
 "+ cv												"C"hange "V"imrc
-"+ d												"D"ebug 函数
+"+ 
 "+ e												"E"xecute (编译执行) 函数
 "+
 "+
@@ -187,7 +171,7 @@ nnoremap <silent><Tab>p :tabprevious<CR>	"上一个标签页
 "+
 "+
 "+
-"+ m												"M"ake 函数
+"+ 
 "+
 "+
 "+ 
@@ -516,6 +500,12 @@ if(has("gui_running"))
 	nnoremap <F11> :call GDB()<CR>
 	func! GDB()
 		exec "Termdebug %:r"
+	endfunc
+	"分号sh 进入shell
+	noremap <Leader>sh :call IntoShell()<CR>
+	func! IntoShell()
+		exec "w"
+		exec "terminal"
 	endfunc
 	"行距 linespace
 	set linespace=4
