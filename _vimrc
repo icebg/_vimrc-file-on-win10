@@ -39,9 +39,18 @@ function MyDiff()
 endfunction
 
 " Windows 平台gvim----------{{{
-call plug#begin('~/vimfiles/autoload/plugged')
-Plug 'preservim/nerdtree'
+" Download plug.vim and put it in ~/.vim/autoload
+"在windows平台下这个名称是vimfiles，在unix类平台下是~/.vim
+"   curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+call plug#begin('~/vimfiles/plugged') "这里规定安装目录,中间各行代表获取的插件
+Plug 'octol/vim-cpp-enhanced-highlight'
 call plug#end()
+"状态 :PlugStatus 检查现在 plug 负责的插件状态
+"安装 :PlugInstall 将写入vimrc配置的插件进行安装
+"更新 :PlugUpdate 更新已安装的插件
+"清理 :PlugClean 清理插件，需要现在 .vimrc 里面删除或注释掉
+"升级 :PlugUpgrade 升级自身
 
 nnoremap <F1> :call PlugInstall()<CR>
 func! PlugInstall()
@@ -49,22 +58,42 @@ func! PlugInstall()
 endfunc
 
 "C，C++ 按分号e编译运行
+noremap <Leader><Leader>e :call CompileRunGcc2()<CR>
+func! CompileRunGcc2()
+	exec "w"
+	if &filetype == 'c'
+		exec "! gcc -Wall -g % -o %:r.exe && %:r.exe"
+		"powershell使用分号，cmd使用&&，powershell使用 | 仅对有些命令有效。
+		"linux shell使用分号，所有命令都会执行。使用&&，前面的命令执行成功，才会去执行后面的命令。使用||,前面的命令执行失败后才去执行下一条命令，直到执行成功一条命令为止。
+	elseif &filetype == 'cpp'
+		execute "source  e:/compile-run.vim"
+		"在vimscript中，用点号连接字符串
+		execute "only"
+		execute "vs #1"
+		execute "vertical resize 90"
+	elseif &filetype == 'sh'
+		exec "! bash %"
+		"在当前bash执行此脚本
+	elseif &filetype == 'python'
+		exec "! python.exe %"
+	elseif &filetype == 'dosbatch'
+		exec "! %"
+	endif
+endfunc
 noremap <Leader>e :call CompileRunGcc()<CR>
 func! CompileRunGcc()
 	exec "w"
 	if &filetype == 'c'
-		exec "!g++ -Wall -g % -o %:r.exe; ./%:r.exe"
-		"powershell使用分号，cmd使用&&，powershell使用 | 仅对有些命令有效。
-		"linux shell使用分号，所有命令都会执行。使用&&，前面的命令执行成功，才会去执行后面的命令。使用||,前面的命令执行失败后才去执行下一条命令，直到执行成功一条命令为止。
+		exec "! gcc -Wall -g % -o %:r.exe && %:r.exe"
 	elseif &filetype == 'cpp'
-		exec "!g++ -Wall -std=c++17 -g % -o %:r.exe; ./%:r.exe"
+		exec "! g++ -Wall -std=c++17 -g % -o %:r.exe && %:r.exe"
 	elseif &filetype == 'sh'
-		exec "!bash %"
+		exec "! bash %"
 		"在当前bash执行此脚本
 	elseif &filetype == 'python'
-		exec "!python.exe %"
+		exec "! python.exe %"
 	elseif &filetype == 'dosbatch'
-		exec "! ./%"
+		exec "! %"
 	endif
 endfunc
 "利用C:\Windows\ctags.exe在当前目录下生成详细tag文件的命令：ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q
@@ -111,6 +140,7 @@ nnoremap <c-k> <c-w>k
 nnoremap <space> viw
 vnoremap <space> vviW
 " "S"ource "V"imrc"的首字母，表示重读vimrc配置文件。
+nnoremap <leader>ss <esc>:source *.vim<cr>
 nnoremap <leader>sv <esc>:source $MYVIMRC<cr>
 "分号sh 进入shell
 noremap <Leader>sh :call IntoShell()<CR>
@@ -126,7 +156,6 @@ func! Ctag()
 		elseif &filetype == 'cpp'
 			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
 		endif
-	endif
 endfunc
 " 使用;w快捷键保存内容
 nnoremap <Leader>w :w<CR>
@@ -157,11 +186,12 @@ nnoremap <Leader>7 7gt
 nnoremap <Leader>8 8gt
 nnoremap <Leader>9 9gt
 nnoremap <Leader>0 :tablast<CR>	"最后一个标签页
-nnoremap <silent><s-tab> :tabprevious<CR>	"上一个标签页
-inoremap <silent><s-tab> <Esc>:tabprevious<CR>	
 nnoremap <silent><Tab>q :tabclose<CR>	"退出标签
 nnoremap <silent><Tab>n :tabnext<CR>	"下一个标签页
+inoremap <silent><Tab>n <Esc>:tabnext<CR>	"下一个标签页
 nnoremap <silent><Tab>p :tabprevious<CR>	"上一个标签页
+nnoremap <silent><s-tab> :tabprevious<CR>	"上一个标签页
+inoremap <silent><s-tab> <Esc>:tabprevious<CR>	
 " }}}
 " <Leader>映射已经使用的快捷键说明----------{{{
 "+ 1 2 3 4 5 6 7 8 9 0                              访问第几个tab标签页
@@ -209,6 +239,8 @@ set nocompatible  "去掉讨厌的有关vi兼容模式，避免以前版本的�
 set showcmd	"输入的命令显示出来，看的清楚些"
 set showmatch "开启高亮显示匹配括号"
 set showmode "显示当前处于哪种模式
+colorscheme molokai "设置配色方案，在~/.vim/colors/目录下提前放置molokai.vim.至于gvim我喜欢motus, ubuntu的vim我喜欢default,molokai，vsvim我喜欢web13234.vssettings
+set shell=cmd
 set laststatus=2 "显示状态栏
 set number	"显示行号
 set cursorline  " 突出显示当前行
@@ -417,12 +449,12 @@ augroup c_cpp_
 	autocmd!
 	autocmd FileType c,cpp setlocal tabstop=4|setlocal shiftwidth=4|setlocal softtabstop=4|setlocal noexpandtab
 	autocmd FileType c,cpp setlocal cindent 
+	autocmd FileType c,cpp setlocal makeprg=g++\ -Wall\ -g\ -o\ %:r.exe\ %
 
 	autocmd FileType c,cpp setlocal foldmethod=marker
 	autocmd FileType c,cpp setlocal foldmarker=@hyf,fyh@
 	"打开c,cpp文件时全部折叠
 	autocmd BufReadPre *.cpp,*.c setlocal foldlevelstart=0
-
 	autocmd FileType c iabbrev <buffer>			yfc #include<stdio.h><cr>#include<stdlib.h><cr>int main()<cr>{<cr>exit(0);<cr>}<esc>kO<esc>i   
 	autocmd FileType cpp iabbrev <buffer>		yfpp #include<cstdio><cr>#include<cmath><cr>#include<iostream><cr>int main()<cr>{<cr>using std::cout;<cr>return 0;<cr>}<esc>kO<esc>i   
 
@@ -515,7 +547,6 @@ if(has("gui_running"))
 	endfunc
 	"行距 linespace
 	set linespace=4
-	set shell=pwsh
 	colorscheme motus "设置配色方案，在~/.vim/colors/目录下提前放置molokai.vim.至于gvim我喜欢motus, ubuntu的vim我喜欢default,molokai，vsvim我喜欢web13234.vssettings
 	autocmd BufReadPost *.txt exe ": colorscheme Autumn2"|setlocal linespace=10
 	set guioptions-=T "去掉工具栏
