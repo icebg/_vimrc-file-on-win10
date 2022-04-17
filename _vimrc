@@ -65,7 +65,7 @@ func! CompileRunGcc2()
 		exec "! gcc -Wall -g % -o %:r.exe && %:r.exe"
 		"powershell使用分号，cmd使用&&，powershell使用 | 仅对有些命令有效。
 		"linux shell使用分号，所有命令都会执行。使用&&，前面的命令执行成功，才会去执行后面的命令。使用||,前面的命令执行失败后才去执行下一条命令，直到执行成功一条命令为止。
-	elseif &filetype == 'cpp'
+	elseif &filetype == 'cpp' 
 		execute "source  e:/compile-run.vim"
 		"在vimscript中，用点号连接字符串
 		execute "only"
@@ -151,11 +151,11 @@ endfunc
 "分号tag 生成 并更新tag文件 "有了ctag以后，ctrl+] 进入函数定义，ctrl+o 回退。 
 noremap <Leader>tag :call Ctag()<CR>
 func! Ctag()
-		if &filetype == 'c'
-			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
-		elseif &filetype == 'cpp'
-			exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
-		endif
+	if &filetype == 'c'
+		exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
+	elseif &filetype == 'cpp'
+		exec "silent :!ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q" 
+	endif
 endfunc
 " 使用;w快捷键保存内容
 nnoremap <Leader>w :w<CR>
@@ -328,7 +328,7 @@ augroup global
 	autocmd!
 	"打开任何类型的文件时，自动缩进。(BufNewFile表示即使这个文件不存在，也创建并保存到硬盘)
 	"注释不要写到自动命令后面(尤其是normal关键字后面)。 
-	"autocmd BufWritePre,BufRead *.html normal gg=G 
+	"autocmd BufWritePre,BufRead *.html normal! gg=G 
 
 	"SetTitle()自动插入文件头 
 	func! SetTitle()                          "定义函数 SetTitle，自动插入文件头
@@ -376,7 +376,7 @@ augroup global
 			call append(line(".")+1, "")
 		endif
 		"如果文件后缀为 .cpp 
-		if expand("%:e") == 'cpp'
+		if expand("%:e") == 'cpp' && file_readable("initial_codes.cpp")==0
 			call setline(1, "#include<iostream>")
 			call append(line("."), "using namespace std;")
 			call append(line(".")+1, "int main()")
@@ -393,11 +393,11 @@ augroup global
 		endif
 	endfunc
 	autocmd BufNewFile *.sh,*.java,*.h,*.c,*.cpp,makefile,*.py,*.rb exec ":call SetTitle()"
-	autocmd BufNewFile *.c,*.cpp normal 5gg
-	autocmd BufNewFile *.h normal ggo
+	autocmd BufNewFile *.c,*.cpp normal! 5gg
+	autocmd BufNewFile *.h normal! ggo
 
 	func! ReadAllFileType()
-		normal	gg=G
+		normal!	gg=G
 		" Vim 重新打开文件时，回到上次历史所编辑文件的位置
 		if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif 
 	endfunc
@@ -445,16 +445,16 @@ set statusline+=\ [pos=%04l,%04v][%p%%] "position
 set statusline+=\ [len=%L] "lenth of lines
 " }}}
 " FileType settings ----------{{{
-augroup c_cpp_
+augroup c_cpp__
 	autocmd!
 	autocmd FileType c,cpp setlocal tabstop=4|setlocal shiftwidth=4|setlocal softtabstop=4|setlocal noexpandtab
-	autocmd FileType c,cpp setlocal cindent 
 	autocmd FileType c,cpp setlocal makeprg=g++\ -Wall\ -g\ -o\ %:r.exe\ %
-
-	autocmd FileType c,cpp setlocal foldmethod=marker
-	autocmd FileType c,cpp setlocal foldmarker=@hyf,fyh@
+	"makeprg参数设置以后，：make将执行这个语句，且可以用cw打开错误信息、cn等跳转到下一个错误
+	autocmd FileType c,cpp setlocal cindent
+	autocmd FileType c,cpp setlocal foldmethod=marker | setlocal foldmarker=@hyf,fyh@ "手动
 	"打开c,cpp文件时全部折叠
 	autocmd BufReadPre *.cpp,*.c setlocal foldlevelstart=0
+
 	autocmd FileType c iabbrev <buffer>			yfc #include<stdio.h><cr>#include<stdlib.h><cr>int main()<cr>{<cr>exit(0);<cr>}<esc>kO<esc>i   
 	autocmd FileType cpp iabbrev <buffer>		yfpp #include<cstdio><cr>#include<cmath><cr>#include<iostream><cr>int main()<cr>{<cr>using std::cout;<cr>return 0;<cr>}<esc>kO<esc>i   
 
@@ -472,34 +472,10 @@ augroup c_cpp_
 	autocmd FileType c,cpp iabbrev <buffer>		ptt ->next
 	"PointNeXt
 	autocmd FileType c,cpp iabbrev <buffer>		pnx ->next
-	"加 Plus 
-	autocmd FileType c,cpp iabbrev <buffer>		jo +
-	"减 minus 
-	autocmd FileType c,cpp iabbrev <buffer>		gn -
-	"乘
-	autocmd FileType c,cpp iabbrev <buffer>		xn *
-	"除
-	autocmd FileType c,cpp iabbrev <buffer>		fv /
-	"等 Equal
-	autocmd FileType c,cpp iabbrev <buffer>		dn =
-	"小于
-	autocmd FileType c,cpp iabbrev <buffer>		dv >
-	"大于
-	autocmd FileType c,cpp iabbrev <buffer>		xv <
-
-	"括-号
-	autocmd FileType c,cpp inoremap <buffer>	;k ()<esc>i
-	"中括-号
-	autocmd FileType c,cpp inoremap <buffer>	;zk []<esc>i
-	"花括-号
-	autocmd FileType c,cpp inoremap <buffer>	;hk {}<esc>i
-	"百-分号
-	autocmd FileType c,cpp inoremap <buffer>	;b %
-	"取-址符号
-	autocmd FileType c,cpp inoremap <buffer>	;q &
 
 	"c,cpp注释(comment)快捷键：-c
 	autocmd FileType c,cpp nnoremap <buffer> <localleader>c I//<esc>
+	autocmd FileType cpp  call LeetCode()
 augroup END
 augroup python_
 	autocmd!
@@ -548,12 +524,19 @@ if(has("gui_running"))
 	"行距 linespace
 	set linespace=4
 	colorscheme motus "设置配色方案，在~/.vim/colors/目录下提前放置molokai.vim.至于gvim我喜欢motus, ubuntu的vim我喜欢default,molokai，vsvim我喜欢web13234.vssettings
-	autocmd BufReadPost *.txt exe ": colorscheme Autumn2"|setlocal linespace=10
+	autocmd BufReadPost *.txt execute ": colorscheme Autumn2"|setlocal linespace=10
 	set guioptions-=T "去掉工具栏
 	set guioptions-=m "去掉菜单栏
 	"set guifont=Bitstream\ Vera\ Sans\ Mono:h12
 	set guifont=Cr.DejaVuSansMono.YaHei:h12
 	set tags+=D:/MinGW/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/tags
+	function! LeetCode()
+		if file_readable(expand("%"))==0
+			if file_readable("initial_codes.cpp")&&file_readable("leetcode_script.vim")
+				silent source leetcode_script.vim
+			endif
+		endif
+	endfunction
 endif
 "}}}
 
