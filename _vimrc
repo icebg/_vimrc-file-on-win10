@@ -38,51 +38,9 @@ function MyDiff()
 	endif
 endfunction
 
+
 " Windows 平台gvim----------{{{
-" Download plug.vim and put it in ~/.vim/autoload
-"在windows平台下这个名称是vimfiles，在unix类平台下是~/.vim
-"   curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-call plug#begin('~/vimfiles/plugged') "这里规定安装目录,中间各行代表获取的插件
-"高亮 类，成员函数，标准库和模板
-Plug 'octol/vim-cpp-enhanced-highlight'
-"查看函数原型, 则可以通过按键"Alt+ -"和"Alt+ =“向前和向后翻页查看重载版本
-Plug 'mbbill/echofunc'
-call plug#end()
-"状态 :PlugStatus 检查现在 plug 负责的插件状态
-"安装 :PlugInstall 将写入vimrc配置的插件进行安装
-"更新 :PlugUpdate 更新已安装的插件
-"清理 :PlugClean 清理插件，需要现在 .vimrc 里面删除或注释掉
-"升级 :PlugUpgrade 升级自身
-
-nnoremap <F1> :call PlugInstall()<CR>
-func! PlugInstall()
-	exec "PlugInstall"
-endfunc
-
 "C，C++ 按分号e编译运行
-noremap <Leader><Leader>e :call CompileRunGcc2()<CR>
-func! CompileRunGcc2()
-	exec "w"
-	if &filetype == 'c'
-		exec "! gcc -Wall -g % -o %:r.exe && %:r.exe"
-		"powershell使用分号，cmd使用&&，powershell使用 | 仅对有些命令有效。
-		"linux shell使用分号，所有命令都会执行。使用&&，前面的命令执行成功，才会去执行后面的命令。使用||,前面的命令执行失败后才去执行下一条命令，直到执行成功一条命令为止。
-	elseif &filetype == 'cpp' 
-		execute "source  e:/compile-run.vim"
-		"在vimscript中，用点号连接字符串
-		execute "only"
-		execute "vs #1"
-		execute "vertical resize 90"
-	elseif &filetype == 'sh'
-		exec "! bash %"
-		"在当前bash执行此脚本
-	elseif &filetype == 'python'
-		exec "! python.exe %"
-	elseif &filetype == 'dosbatch'
-		exec "! %"
-	endif
-endfunc
 noremap <Leader>e :call CompileRunGcc()<CR>
 func! CompileRunGcc() "使用 cmd 作为shell
 	exec "w"
@@ -94,18 +52,17 @@ func! CompileRunGcc() "使用 cmd 作为shell
 		exec "! bash %"
 		"在当前bash执行此脚本
 	elseif &filetype == 'python'
-		exec "! python.exe %"
+		exec "!python %"
 	elseif &filetype == 'dosbatch'
 		exec "! %"
 	endif
 endfunc
+"}}}
+"-------------------以下与gvim和vim无关(上面的是我在windows上的设置，上面的不要变动。)----------------------
 "利用C:\Windows\ctags.exe在当前目录下生成详细tag文件的命令：ctags -R --languages=c++ --langmap=c++:+.inl -h +.inl --c++-kinds=+p+x-d --fields=+liaS --extras=+q
 "各个参数的解析，请看这个中文网站：https://www.cnblogs.com/coolworld/p/5602589.html
 " 以及这里 有中文帮助: https://blog.easwy.com/archives/exuberant-ctags-chinese-manual/
-"}}}
 
-"yes!the former partion still here in _vimrc successfully![[[[former]]]]
-"yes!the latter partion trans successfully![[[[latter]]]]
 "目前我的vim个人配置文件
 "一般的映射，都写nore防止递归, 函数则写感叹号function!
 
@@ -374,7 +331,7 @@ augroup global
 			call append(line("."),"# encoding: utf-8")
 			call append(line(".")+1, "")
 		endif
-		"如果文件后缀为 .cpp 
+		"如果文件后缀为 .cpp  且 不存在initial_codes（非刷题目录）。
 		if expand("%:e") == 'cpp' && file_readable("initial_codes.cpp")==0
 			call setline(1, "#include<iostream>")
 			call append(line("."), "using namespace std;")
@@ -522,6 +479,28 @@ let g:cpp_class_scope_highlight = 1 "类作用域的突出显示
 let g:cpp_member_variable_highlight = 1 "成员变量的突出显示
 let g:cpp_concepts_highlight = 1  "标准库的关键字 高亮
 
+"插件plug-vim {{{
+" Download plug.vim and put it in ~/.vim/autoload
+"在windows平台下这个名称是vimfiles，在unix类平台下是~/.vim
+"   curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+call plug#begin('~/vimfiles/plugged') "这里规定安装目录,中间各行代表获取的插件
+"高亮 类，成员函数，标准库和模板
+Plug 'octol/vim-cpp-enhanced-highlight'
+"查看函数原型, 则可以通过按键"Alt+ -"和"Alt+ =“向前和向后翻页查看重载版本
+Plug 'mbbill/echofunc'
+call plug#end()
+"----------------------------------------
+"状态 :PlugStatus 检查现在 plug 负责的插件状态
+"安装 :PlugInstall 将写入vimrc配置的插件进行安装
+"更新 :PlugUpdate 更新已安装的插件
+"清理 :PlugClean 清理插件，需要现在 .vimrc 里面删除或注释掉
+"升级 :PlugUpgrade 升级自身
+nnoremap <F1> :call PlugInstall()<CR>
+func! PlugInstall()
+	exec "PlugInstall"
+endfunc
+"}}}
 
 "这下面是笔记，或者是教程
 " # vim ctags cheatsheet {{{
