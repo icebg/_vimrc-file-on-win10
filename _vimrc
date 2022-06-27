@@ -34,7 +34,7 @@ if(isWindows)
 	"弄一弄windows下tag路径
 	set tags+=D:/MinGW/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/tags
 	set tags+=D:/MinGW/mingw64/x86_64-w64-mingw32/include/tags
-	" window里刷LeetCode题
+	" windows里刷LeetCode题
 	function! LeetCode()
 		" 这个c,cpp文件是新建的话，那就要做以下步骤 清空。
 		if file_readable(expand("%"))==0
